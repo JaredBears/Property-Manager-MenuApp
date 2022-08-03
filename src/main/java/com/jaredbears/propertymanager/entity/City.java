@@ -2,7 +2,7 @@ package com.jaredbears.propertymanager.entity;
 
 public class City {
   private Integer cityID;
-  private Integer stateID;
+  private String stateCode;
   private String cityName;
 
   
@@ -14,12 +14,12 @@ public class City {
     this.cityID = cityID;
   }
 
-  public Integer getStateID() {
-    return stateID;
+  public String getStateCode() {
+    return stateCode;
   }
 
-  public void setStateID(Integer stateID) {
-    this.stateID = stateID;
+  public void setStateCode(String stateCode) {
+    this.stateCode = stateCode;
   }
 
   public String getCityName() {
