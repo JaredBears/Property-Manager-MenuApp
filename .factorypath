@@ -25,6 +25,7 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-aop/5.3.22/spring-aop-5.3.22.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-context/5.3.22/spring-context-5.3.22.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-expression/5.3.22/spring-expression-5.3.22.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/mysql/mysql-connector-java/8.0.29/mysql-connector-java-8.0.29.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springdoc/springdoc-openapi-ui/1.6.9/springdoc-openapi-ui-1.6.9.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springdoc/springdoc-openapi-webmvc-core/1.6.9/springdoc-openapi-webmvc-core-1.6.9.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springdoc/springdoc-openapi-common/1.6.9/springdoc-openapi-common-1.6.9.jar" enabled="true" runInBatchMode="false"/>

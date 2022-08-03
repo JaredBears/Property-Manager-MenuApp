@@ -16,8 +16,8 @@ CREATE TABLE city(
     state_code CHAR(2) NOT NULL,
     city_name VARCHAR(64) NOT NULL,
     PRIMARY KEY (city_id),
+    UNIQUE KEY (city_name, state_code),
     FOREIGN KEY (state_code) REFERENCES state (state_code) ON DELETE CASCADE
-    UNIQUE KEY (city_name, state_code)
 );
 
 CREATE TABLE property(
@@ -27,6 +27,7 @@ CREATE TABLE property(
     yearly_taxes DECIMAL(8, 2) NOT NULL,
     monthly_mortgage DECIMAL(7, 2) NOT NULL,
     PRIMARY KEY (property_id),
+    UNIQUE KEY (street_address, city_id),
     FOREIGN KEY (city_id) REFERENCES city (city_id) ON DELETE CASCADE
 );
 
@@ -36,6 +37,7 @@ CREATE TABLE unit(
     unit_number VARCHAR(4) NOT NULL,
     monthly_rent DECIMAL(7, 2) NOT NULL,
     PRIMARY KEY (unit_id),
+    UNIQUE KEY (unit_number, property_id),
     FOREIGN KEY (property_id) REFERENCES property (property_id) ON DELETE CASCADE
 );
 
@@ -46,6 +48,7 @@ CREATE TABLE tenant(
     tenant_phone CHAR(10) NOT NULL,
     tenant_email VARCHAR(64) NOT NULL,
     PRIMARY KEY (tenant_id),
+    UNIQUE KEY (tenant_name, unit_id),
     FOREIGN KEY (unit_id) REFERENCES unit (unit_id) ON DELETE CASCADE
 );
 

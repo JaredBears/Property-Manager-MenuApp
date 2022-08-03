@@ -1,6 +1,6 @@
 package com.jaredbears.propertymanager.entity;
 
-public class People {
+public abstract class People {
   private Integer id;
   private String name;
   private String phone;

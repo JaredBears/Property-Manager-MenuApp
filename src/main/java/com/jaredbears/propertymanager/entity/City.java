@@ -1,5 +1,7 @@
 package com.jaredbears.propertymanager.entity;
 
+import java.util.List;
+
 public class City {
   private Integer cityID;
   private String stateCode;
@@ -28,6 +30,11 @@ public class City {
 
   public void setCityName(String cityName) {
     this.cityName = cityName;
+  }
+
+  public List<Property> getProperties() {
+    // TODO Auto-generated method stub
+    return null;
   }
   
   
