@@ -28,30 +28,38 @@ public class PropertyManagement {
 
   //@formatter:off
   private List<String> operations = List.of(
-      "1) Select State",
-      "2) Select City",
-      "3) Manage properties",
-      "4) Manage units",
-      "5) Manage employees"
+    "1) Select State",
+    "2) Select City",
+    "3) Manage properties",
+    "4) Manage units",
+    "5) Manage employees"
+  );
+  private List<String> propMenu = List.of(
+    "6) Select a Property",
+    "7) Add a Property",
+    "8) Delete a Property"
   );
   //@formatter:on
 
   public static void main(String[] args) {
     // SpringApplication.run(PropertyManagement.class, args);
-    new PropertyManagement().processUserSelection();
+    new PropertyManagement().processUserSelection(1);
   }
 
-  private void processUserSelection() {
+  private void processUserSelection(int menuLevel) {
     boolean done = false;
 
     while (!done) {
       try {
-        int selection = getUserSelection();
+        int selection = getUserSelection(menuLevel);
 
         switch (selection) {
           case -1:
             done = exitMenu();
             break;
+          /*
+           * Main Menu
+           */
           case 1:
             selectState();
             break;
@@ -67,6 +75,19 @@ public class PropertyManagement {
           case 5:
             manageEmployees();
             break;
+          /*
+           * Property Menu
+           */
+          case 6:
+            selectProperty();
+            break;
+          case 7:
+            addProperty();
+            break;
+          case 8:
+            deleteProperty();
+            break;
+
           default:
             System.out.println("\n" + selection + " is not a valid selection. Try again.");
             break;
@@ -83,16 +104,16 @@ public class PropertyManagement {
     curCity = null;
     curProperty = null;
     curUnit = null;
-    
+
     EnumSet<State> states = EnumSet.allOf(State.class);
     states.forEach(System.out::println);
     String state = getStringInput("\nEnter the two-letter state code");
     try {
       curState = State.valueOf(state);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.out.println("\nInvalid State.  Please try again.");
     }
-    
+
 
   }
 
@@ -100,30 +121,120 @@ public class PropertyManagement {
     curCity = null;
     curProperty = null;
     curUnit = null;
-    
-    if(Objects.isNull(curState)) {
+
+    if (Objects.isNull(curState)) {
       System.out.println("\nYou must select a state first.");
-      return;
+      selectState();
     }
-    Character firstChar = getCharInput("\nEnter the first letter of the city you would like to work in");
+    Character firstChar =
+        getCharInput("\nEnter the first letter of the city you would like to work in");
     listCities(firstChar);
     Integer cityID = getIntInput("\nEnter the city ID number");
-    
+
     curCity = propertyService.fetchCityByID(cityID);
   }
 
   private void listCities(Character firstChar) {
     List<City> cities = propertyService.fetchCities(curState, firstChar);
-    
+
     System.out.println("City ID)    City Name, State");
-    for(City city : cities) {
-      System.out.println(city.getCityID() + ") " + city.getCityName() + ", " + city.getStateCode());
+    for (City city : cities) {
+      System.out
+          .println(city.getCityID() + ")     " + city.getCityName() + ", " + city.getStateCode());
     }
   }
 
   private void manageProperties() {
-    // TODO Auto-generated method stub
+    processUserSelection(2);
 
+  }
+
+  private void selectProperty() {
+    curUnit = null;
+    
+    if(Objects.isNull(curState)) {
+      System.out.println("You must select a state first");
+      selectState();
+    }
+    if(Objects.isNull(curCity)) {
+      System.out.println("You must select a city first");
+      selectCity();
+    }
+
+    listProperties();
+    
+    Integer propertyID = getIntInput("\nEnter the property ID number");
+    
+    curProperty = propertyService.fetchPropertyByID(propertyID);
+  }
+
+  private void listProperties() {
+    List<Property> properties = propertyService.fetchProperties(curCity.getCityID());
+    
+    System.out.println("Property ID)    Street Address");
+    for(Property property : properties) {
+      System.out.println(property.getPropertyID() + ")    " + property.getStreetAddress());
+    }
+  }
+
+  private void addProperty() {
+    curProperty = null;
+    curUnit = null;
+    if (Objects.isNull(curState)) {
+      System.out.println("\nYou must select a state before adding a property.");
+      selectState();
+    }
+    if (Objects.isNull(curCity)) {
+      System.out.println("\nYou must select a city before adding a property.");
+      selectCity();
+    }
+
+    String streetAddress = getStringInput("Enter the street address");
+    BigDecimal taxes = getDecimalInput("Enter the yearly taxes for " + streetAddress);
+    BigDecimal mortgage = getDecimalInput("Enter the monthly mortgage for " + streetAddress);
+
+    Property property = new Property();
+
+    property.setCityID(curCity.getCityID());
+    property.setStreetAddress(streetAddress);
+    property.setTaxes(taxes);
+    property.setMortgage(mortgage);
+
+    Property dbProperty = propertyService.addProperty(property);
+    System.out.println("You have successfully added " + dbProperty.getStreetAddress() + " to "
+        + curCity.getCityName());
+
+    curProperty = dbProperty;
+    
+    addUnits();
+  }
+
+  private void addUnits() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  private void deleteProperty() {
+    if (Objects.isNull(curProperty)) {
+      System.out.println("\nYou do not have a property selected.");
+      selectProperty();
+    }
+
+    System.out.println("\nYou are working with the following property:");
+    System.out.println("Property ID: " + curProperty.getPropertyID());
+    System.out.println(curProperty.getStreetAddress());
+    System.out.println(curCity.getCityName() + ", " + curCity.getStateCode());
+
+    Integer input = getIntInput(
+        "Enter the Property ID to confirm deletion, or press Enter to return to the menu");
+
+    if (input == curProperty.getPropertyID()) {
+      propertyService.deleteProperty(curProperty.getPropertyID());
+    } else if (Objects.isNull(input)) {
+      System.out.println("\nReturning to menu.");
+    } else {
+      System.out.println("\nInvalid entry. Returning to menu");
+    }
   }
 
   private void manageUnits() {
@@ -165,8 +276,30 @@ public class PropertyManagement {
     }
   }
 
-  private int getUserSelection() {
-    printOperations();
+  private void printPropMenu() {
+    System.out.println(
+        "\nThese are the available selections. Press the Enter key to return to main menu.");
+    propMenu.forEach(line -> System.out.println("  " + line));
+    if (Objects.isNull(curState)) {
+      System.out.println("\nYou do not have a state selected");
+    } else if (Objects.isNull(curCity)) {
+      System.out.println(
+          "\nYou are working in State: " + curState + ". \nYou do not have a city selected.");
+    } else if (Objects.isNull(curProperty)) {
+      System.out.println("\nYou are working in " + curCity.getCityName() + ", "
+          + curCity.getStateCode() + ". \nYou do not have a property selected.");
+    } else {
+      System.out.println("\nYou are working with \n" + curProperty.getStreetAddress() + "\n"
+          + curCity.getCityName() + ", " + curCity.getStateCode());
+    }
+  }
+
+  private int getUserSelection(int menuLevel) {
+    if (menuLevel == 2) {
+      printPropMenu();
+    } else {
+      printOperations();
+    }
 
     Integer input = getIntInput("\nEnter a menu selection");
 
@@ -195,20 +328,20 @@ public class PropertyManagement {
       throw new DbException(input + " is not a valid number.");
     }
   }
-  
+
   private Character getCharInput(String prompt) {
     String input = getStringInput(prompt);
-    
-    if(Objects.isNull(input)) {
+
+    if (Objects.isNull(input)) {
       return null;
     }
     try {
-      if(Character.isLetter(input.charAt(0))){
+      if (Character.isLetter(input.charAt(0))) {
         return input.toUpperCase().charAt(0);
       } else {
         throw new DbException(input + " is not a valid entry.");
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       throw new DbException(input + " is not a valid entry.");
     }
   }
