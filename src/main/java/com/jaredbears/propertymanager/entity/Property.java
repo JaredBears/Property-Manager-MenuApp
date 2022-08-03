@@ -1,6 +1,7 @@
 package com.jaredbears.propertymanager.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class Property {
   private Integer propertyID;
@@ -8,6 +9,7 @@ public class Property {
   private String streetAddress;
   private BigDecimal taxes;
   private BigDecimal mortgage;
+  private List<Unit> units;
   
   public Integer getPropertyID() {
     return propertyID;
@@ -47,6 +49,14 @@ public class Property {
 
   public void setMortgage(BigDecimal mortgage) {
     this.mortgage = mortgage;
+  }
+
+  public List<Unit> getUnits() {
+    return units;
+  }
+
+  public void setUnits(List<Unit> units) {
+    this.units = units;
   }
   
 
