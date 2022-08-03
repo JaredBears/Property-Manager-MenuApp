@@ -14,7 +14,7 @@ public enum State {
   ME, MD, MA, MI, MN, MS, MO, MT,
   NE, NV, NH, NJ, NM, NY, NC, ND,
   OH, OK, OR, 
-  PA,
+  PA, PR,
   RI,
   SC, SD, 
   TN, TX,
