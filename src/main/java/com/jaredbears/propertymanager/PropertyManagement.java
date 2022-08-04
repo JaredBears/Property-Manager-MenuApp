@@ -2,6 +2,7 @@ package com.jaredbears.propertymanager;
 
 import java.math.BigDecimal;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -295,6 +296,7 @@ public class PropertyManagement {
 
   private void addUnits() {
     curUnit = null;
+    List<Unit> units = new LinkedList<>();
     Integer loop = getIntInput("How many units to add");
     if (Objects.isNull(curProperty)) {
       System.out.println("You must select a property first.");
@@ -311,11 +313,10 @@ public class PropertyManagement {
       unit.setRent(rent);
       unit.setLeased(false);
       unit.setTenant(null);
-
-      propertyService.addUnit(unit);
-
+      unit.setUnitID(propertyService.addUnit(unit));
+      units.add(unit);
     }
-
+    curProperty.setUnits(units);
   }
 
   private void deleteUnit() {
@@ -339,6 +340,7 @@ public class PropertyManagement {
     } else {
       System.out.println("\nInvalid entry. Returning to menu.");
     }
+    curProperty.getUnits().remove(curUnit);
     curUnit = null;
   }
 
@@ -370,7 +372,29 @@ public class PropertyManagement {
   }
 
   private void terminate() {
-    // TODO Auto-generated method stub
+    if (Objects.isNull(curUnit)) {
+      System.out.println("\nYou do not have a Unit selected.");
+      selectUnit();
+    }
+
+    System.out.println("\nYou are working with the following unit:");
+    System.out.println("Unit ID: " + curUnit.getUnitID());
+    System.out.println(curUnit.getUnitNumber() + " - " + curProperty.getStreetAddress());
+    System.out.println(curCity.getCityName() + ", " + curCity.getStateCode());
+
+    Integer input = getIntInput(
+        "Enter the Unit ID to confirm lease termination, or press Enter to return to the menu");
+
+    if (input == curUnit.getUnitID()) {
+      curUnit.setLeased(false);
+      propertyService.updateUnit(curUnit);
+      propertyService.terminateTenant(curUnit.getUnitID());
+    } else if (Objects.isNull(input)) {
+      System.out.println("\nReturning to menu.");
+    } else {
+      System.out.println("\nInvalid entry. Returning to menu.");
+    }
+    curUnit = null;
   }
 
   private void manageEmployees() {

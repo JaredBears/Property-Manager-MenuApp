@@ -13,6 +13,7 @@ import java.util.Optional;
 import com.jaredbears.propertymanager.entity.City;
 import com.jaredbears.propertymanager.entity.Property;
 import com.jaredbears.propertymanager.entity.State;
+import com.jaredbears.propertymanager.entity.Tenant;
 import com.jaredbears.propertymanager.entity.Unit;
 import com.jaredbears.propertymanager.exception.DbException;
 
@@ -39,7 +40,7 @@ public class PropertyDao extends DaoBase {
 
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-              city = extract(rs, City.class);
+              city = new City();
               city.setCityID(rs.getInt("city_id"));
               city.setCityName(rs.getString("city_name"));
               city.setStateCode(rs.getString("state_code"));
@@ -168,7 +169,7 @@ public class PropertyDao extends DaoBase {
 
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-              property = extract(rs, Property.class);
+              property = new Property();
               property.setPropertyID(rs.getInt("property_id"));
               property.setStreetAddress(rs.getString("street_address"));
               property.setTaxes(rs.getBigDecimal("yearly_taxes"));
@@ -194,8 +195,56 @@ public class PropertyDao extends DaoBase {
   }
 
   private List<Unit> fetchUnitsForProperty(Connection conn, Integer propertyID) {
-    // TODO Auto-generated method stub
-    return null;
+    String sql = "SELECT * FROM " + UNIT_TABLE + " WHERE property_id = ?";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+      setParameter(stmt, 1, propertyID, Integer.class);
+      try (ResultSet rs = stmt.executeQuery()) {
+        List<Unit> units = new LinkedList<>();
+
+        while (rs.next()) {
+          Unit unit = new Unit();
+          unit.setLeased(rs.getBoolean("leased"));
+          unit.setPropertyID(rs.getInt("property_id"));
+          unit.setRent(rs.getBigDecimal("monthly_rent"));
+          unit.setUnitID(rs.getInt("unit_id"));
+          unit.setUnitNumber(rs.getString("unit_number"));
+          if (unit.getLeased()) {
+            unit.setTenant(fetchTenantForUnit(conn, unit.getUnitID()));
+          }
+          units.add(unit);
+        }
+
+        return units;
+      }
+    } catch (Exception e) {
+      throw new DbException(e);
+    }
+  }
+
+  public Tenant fetchTenantForUnit(Connection conn, Integer unitID) {
+    String sql = "SELECT * FROM " + TENANT_TABLE + " WHERE unit_id = ?";
+    
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+      setParameter(stmt, 1, unitID, Integer.class);
+      try (ResultSet rs = stmt.executeQuery()) {
+        Tenant tenant = null;
+
+        if(rs.next()) {
+          tenant = new Tenant();
+          tenant.setID(rs.getInt("tenant_id"));
+          tenant.setUnitID(unitID);
+          tenant.setName(rs.getString("tenant_name"));
+          tenant.setPhone(rs.getString("tenant_phone"));
+          tenant.setEmail(rs.getString("tenant_email"));;
+        }
+        
+        return tenant;
+
+      }
+    } catch (Exception e) {
+      throw new DbException(e);
+    }
   }
 
   public Property insertProperty(Property property) {
@@ -231,9 +280,42 @@ public class PropertyDao extends DaoBase {
     }
   }
 
-  public void insertUnit(Unit unit) {
-    // TODO Auto-generated method stub
+  public Integer insertUnit(Unit unit) {
+    // @formatter:off
+    String sql = "" 
+      +"INSERT INTO " + UNIT_TABLE + " "
+      +"(property_id, unit_number, monthly_rent, leased) "
+      +"VALUES "
+      +"(?, ?, ?, ?)";
+    // @formatter:on
+    try (Connection conn = DbConnection.getConnection()) {
+      startTransaction(conn);
 
+      try (PreparedStatement stmt = conn.prepareCall(sql)) {
+        setParameter(stmt, 1, unit.getPropertyID(), Integer.class);
+        setParameter(stmt, 2, unit.getUnitNumber(), String.class);
+        setParameter(stmt, 3, unit.getRent(), BigDecimal.class);
+        if(unit.getLeased()) {
+          setParameter(stmt, 4, 1, Integer.class);
+        } else {
+          setParameter(stmt, 4, 0, Integer.class);
+        }
+        
+
+        stmt.executeUpdate();
+
+        Integer unitID = getLastInsertId(conn, UNIT_TABLE);
+        commitTransaction(conn);
+
+        unit.setUnitID(unitID);
+        return unitID;
+      } catch (Exception e) {
+        rollbackTransaction(conn);
+        throw new DbException(e);
+      }
+    } catch (SQLException e) {
+      throw new DbException(e);
+    }
   }
 
   public Optional<Unit> fetchUnitByID(Integer unitID) {
@@ -244,6 +326,21 @@ public class PropertyDao extends DaoBase {
   public boolean deleteUnit(Integer unitID) {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  public void updateUnit(Unit curUnit) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void addTenant(Tenant tenant) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void terminateTenant(Integer unitID) {
+    // TODO Auto-generated method stub
+
   }
 
 }

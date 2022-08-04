@@ -40,8 +40,8 @@ public class PropertyService {
     return propertyDao.fetchUnitByID(unitID).orElseThrow(() -> new NoSuchElementException("Unit with Unit ID=" + unitID + "does not exist"));
   }
   
-  public void addUnit(Unit unit) {
-    propertyDao.insertUnit(unit);
+  public Integer addUnit(Unit unit) {
+    return propertyDao.insertUnit(unit);
   }
 
   public void deleteUnit(Integer unitID) {
@@ -52,12 +52,17 @@ public class PropertyService {
   }
 
   public void updateUnit(Unit curUnit) {
-    // TODO Auto-generated method stub
+    propertyDao.updateUnit(curUnit);
     
   }
 
   public void addTenant(Tenant tenant) {
-    // TODO Auto-generated method stub
+    propertyDao.addTenant(tenant);
+    
+  }
+
+  public void terminateTenant(Integer unitID) {
+    propertyDao.terminateTenant(unitID);
     
   }
 
