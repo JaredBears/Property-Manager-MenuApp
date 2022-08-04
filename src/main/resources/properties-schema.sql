@@ -36,6 +36,7 @@ CREATE TABLE unit(
     property_id INT UNSIGNED NOT NULL,
     unit_number VARCHAR(4) NOT NULL,
     monthly_rent DECIMAL(7, 2) NOT NULL,
+    leased BOOLEAN NOT NULL,
     PRIMARY KEY (unit_id),
     UNIQUE KEY (unit_number, property_id),
     FOREIGN KEY (property_id) REFERENCES property (property_id) ON DELETE CASCADE

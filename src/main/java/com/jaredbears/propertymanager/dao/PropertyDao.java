@@ -40,6 +40,9 @@ public class PropertyDao extends DaoBase {
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
               city = extract(rs, City.class);
+              city.setCityID(rs.getInt("city_id"));
+              city.setCityName(rs.getString("city_name"));
+              city.setStateCode(rs.getString("state_code"));
             }
           }
         }
@@ -64,7 +67,7 @@ public class PropertyDao extends DaoBase {
     String sql = ""
       + "SELECT * FROM " + CITY_TABLE + " "
       + "WHERE state_code = ? AND LEFT(city_name, 1) = ? "
-      + "ORDER_BY city_name";
+      + "ORDER BY city_name";
     // @formatter:on
     try (Connection conn = DbConnection.getConnection()) {
       startTransaction(conn);
@@ -120,8 +123,8 @@ public class PropertyDao extends DaoBase {
     // @formatter:off
     String sql = ""
       + "SELECT * FROM " + PROPERTY_TABLE + " "
-      + "WHERE city_name = ? "
-      + "ORDER_BY street_address";
+      + "WHERE city_id = ? "
+      + "ORDER BY street_address";
     // @formatter:on
     try (Connection conn = DbConnection.getConnection()) {
       startTransaction(conn);
@@ -166,6 +169,10 @@ public class PropertyDao extends DaoBase {
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
               property = extract(rs, Property.class);
+              property.setPropertyID(rs.getInt("property_id"));
+              property.setStreetAddress(rs.getString("street_address"));
+              property.setTaxes(rs.getBigDecimal("yearly_taxes"));
+              property.setMortgage(rs.getBigDecimal("monthly_mortgage"));
             }
           }
         }
@@ -222,6 +229,21 @@ public class PropertyDao extends DaoBase {
     } catch (SQLException e) {
       throw new DbException(e);
     }
+  }
+
+  public void insertUnit(Unit unit) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public Optional<Unit> fetchUnitByID(Integer unitID) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public boolean deleteUnit(Integer unitID) {
+    // TODO Auto-generated method stub
+    return false;
   }
 
 }

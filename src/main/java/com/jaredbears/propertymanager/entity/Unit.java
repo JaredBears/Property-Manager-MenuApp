@@ -7,6 +7,8 @@ public class Unit {
   private Integer propertyID;
   private String unitNumber;
   private BigDecimal rent;
+  private Boolean leased;
+  private Tenant tenant;
   
   public Integer getUnitID() {
     return unitID;
@@ -38,6 +40,22 @@ public class Unit {
 
   public void setRent(BigDecimal rent) {
     this.rent = rent;
+  }
+
+  public Boolean getLeased() {
+    return leased;
+  }
+
+  public void setLeased(Boolean leased) {
+    this.leased = leased;
+  }
+
+  public Tenant getTenant() {
+    return tenant;
+  }
+
+  public void setTenant(Tenant tenant) {
+    this.tenant = tenant;
   }
 
   

@@ -11,6 +11,7 @@ import com.jaredbears.propertymanager.entity.City;
 import com.jaredbears.propertymanager.entity.Employee;
 import com.jaredbears.propertymanager.entity.Property;
 import com.jaredbears.propertymanager.entity.State;
+import com.jaredbears.propertymanager.entity.Tenant;
 import com.jaredbears.propertymanager.entity.Unit;
 import com.jaredbears.propertymanager.service.PropertyService;
 import com.jaredbears.propertymanager.exception.DbException;
@@ -39,6 +40,13 @@ public class PropertyManagement {
     "7) Add a Property",
     "8) Delete a Property"
   );
+  private List<String> unitMenu = List.of(
+    "9) Select a Unit",
+    "10) Add Unit(s) to Property",
+    "11) Delete Unit from Property",
+    "12) Lease to Tenant",
+    "13) Terminate Lease"
+  );
   //@formatter:on
 
   public static void main(String[] args) {
@@ -55,7 +63,11 @@ public class PropertyManagement {
 
         switch (selection) {
           case -1:
-            done = exitMenu();
+            if (menuLevel == 1) {
+              done = exitMenu();
+            } else {
+              processUserSelection(1);
+            }
             break;
           /*
            * Main Menu
@@ -87,6 +99,24 @@ public class PropertyManagement {
           case 8:
             deleteProperty();
             break;
+          /*
+           * Unit Menu
+           */
+          case 9:
+            selectUnit();
+            break;
+          case 10:
+            addUnits();
+            break;
+          case 11:
+            deleteUnit();
+            break;
+          case 12:
+            lease();
+            break;
+          case 13:
+            terminate();
+            break;
 
           default:
             System.out.println("\n" + selection + " is not a valid selection. Try again.");
@@ -107,7 +137,7 @@ public class PropertyManagement {
 
     EnumSet<State> states = EnumSet.allOf(State.class);
     states.forEach(System.out::println);
-    String state = getStringInput("\nEnter the two-letter state code");
+    String state = getStringInput("\nEnter the two-letter state code").toUpperCase();
     try {
       curState = State.valueOf(state);
     } catch (Exception e) {
@@ -150,29 +180,30 @@ public class PropertyManagement {
   }
 
   private void selectProperty() {
+    curProperty = null;
     curUnit = null;
-    
-    if(Objects.isNull(curState)) {
+
+    if (Objects.isNull(curState)) {
       System.out.println("You must select a state first");
       selectState();
     }
-    if(Objects.isNull(curCity)) {
+    if (Objects.isNull(curCity)) {
       System.out.println("You must select a city first");
       selectCity();
     }
 
     listProperties();
-    
+
     Integer propertyID = getIntInput("\nEnter the property ID number");
-    
+
     curProperty = propertyService.fetchPropertyByID(propertyID);
   }
 
   private void listProperties() {
     List<Property> properties = propertyService.fetchProperties(curCity.getCityID());
-    
+
     System.out.println("Property ID)    Street Address");
-    for(Property property : properties) {
+    for (Property property : properties) {
       System.out.println(property.getPropertyID() + ")    " + property.getStreetAddress());
     }
   }
@@ -205,13 +236,8 @@ public class PropertyManagement {
         + curCity.getCityName());
 
     curProperty = dbProperty;
-    
-    addUnits();
-  }
 
-  private void addUnits() {
-    // TODO Auto-generated method stub
-    
+    addUnits();
   }
 
   private void deleteProperty() {
@@ -235,11 +261,116 @@ public class PropertyManagement {
     } else {
       System.out.println("\nInvalid entry. Returning to menu");
     }
+    curProperty = null;
   }
 
   private void manageUnits() {
-    // TODO Auto-generated method stub
+    processUserSelection(3);
+  }
 
+  private void selectUnit() {
+    curUnit = null;
+    if (Objects.isNull(curProperty)) {
+      System.out.println("\nYou must select a property.");
+      selectProperty();
+    }
+    listUnits();
+
+    Integer unitID = getIntInput("Enter the Unit ID");
+
+    curUnit = propertyService.fetchUnitByID(unitID);
+
+  }
+
+  private void listUnits() {
+    System.out.println("Unit ID)  Unit Number");
+    for (Unit unit : curProperty.getUnits()) {
+      System.out.println(unit.getUnitID() + ")    " + unit.getUnitNumber());
+      if (unit.getLeased()) {
+        System.out.println("        Tenant: " + unit.getTenant().getName());
+      }
+    }
+  }
+
+
+  private void addUnits() {
+    curUnit = null;
+    Integer loop = getIntInput("How many units to add");
+    if (Objects.isNull(curProperty)) {
+      System.out.println("You must select a property first.");
+      selectProperty();
+    }
+    for (int i = 0; i < loop; i++) {
+      Unit unit = new Unit();
+      Integer propertyID = curProperty.getPropertyID();
+      String unitNumber = getStringInput("Enter the Unit Number");
+      BigDecimal rent = getDecimalInput("Enter the monthly rent");
+
+      unit.setPropertyID(propertyID);
+      unit.setUnitNumber(unitNumber);
+      unit.setRent(rent);
+      unit.setLeased(false);
+      unit.setTenant(null);
+
+      propertyService.addUnit(unit);
+
+    }
+
+  }
+
+  private void deleteUnit() {
+    if (Objects.isNull(curUnit)) {
+      System.out.println("\nYou do not have a Unit selected.");
+      selectUnit();
+    }
+
+    System.out.println("\nYou are working with the following unit:");
+    System.out.println("Unit ID: " + curUnit.getUnitID());
+    System.out.println(curUnit.getUnitNumber() + " - " + curProperty.getStreetAddress());
+    System.out.println(curCity.getCityName() + ", " + curCity.getStateCode());
+
+    Integer input =
+        getIntInput("Enter the Unit ID to confirm deletion, or press Enter to return to the menu");
+
+    if (input == curUnit.getUnitID()) {
+      propertyService.deleteUnit(curUnit.getUnitID());
+    } else if (Objects.isNull(input)) {
+      System.out.println("\nReturning to menu.");
+    } else {
+      System.out.println("\nInvalid entry. Returning to menu.");
+    }
+    curUnit = null;
+  }
+
+  private void lease() {
+    if (Objects.isNull(curUnit)) {
+      System.out.println("You must select a unit first.");
+      selectUnit();
+    }
+
+    if (curUnit.getLeased()) {
+      System.out
+          .println("This unit is already leased.  You must terminate the existing lease first.");
+    } else {
+      Tenant tenant = new Tenant();
+      String name = getStringInput("Enter the Tenant's name");
+      String phone = getStringInput("Enter the Tenant's phone number");
+      String email = getStringInput("Enter the Tenant's email");
+
+      tenant.setUnitID(curUnit.getUnitID());
+      tenant.setName(name);
+      tenant.setPhone(phone);
+      tenant.setEmail(email);
+
+      curUnit.setLeased(true);
+
+      propertyService.updateUnit(curUnit);
+      propertyService.addTenant(tenant);
+    }
+  }
+
+  private void terminate() {
+    // TODO Auto-generated method stub
   }
 
   private void manageEmployees() {
@@ -249,6 +380,7 @@ public class PropertyManagement {
 
   private boolean exitMenu() {
     System.out.println("\nClosing the menu.");
+    System.exit(0);
     return true;
   }
 
@@ -256,51 +388,29 @@ public class PropertyManagement {
   private void printOperations() {
     System.out.println("\nThese are the available selections. Press the Enter key to quit.");
     operations.forEach(line -> System.out.println("  " + line));
-
-    if (Objects.isNull(curState)) {
-      System.out.println("\nYou do not have a state selected");
-    } else if (Objects.isNull(curCity)) {
-      System.out.println(
-          "\nYou are working in State: " + curState + ". \nYou do not have a city selected.");
-    } else if (Objects.isNull(curProperty)) {
-      System.out.println("\nYou are working in " + curCity.getCityName() + ", "
-          + curCity.getStateCode() + ". \nYou do not have a property selected.");
-    } else if (Objects.isNull(curUnit)) {
-      System.out.println("\nYou are working with \n" + curProperty.getStreetAddress() + "\n"
-          + curCity.getCityName() + ", " + curCity.getStateCode()
-          + "\nYou do not have a unit selected.");
-    } else {
-      System.out.println("\nYou are working with \n Unit: " + curUnit.getUnitNumber() + "\n"
-          + curProperty.getStreetAddress() + "\n" + curCity.getCityName() + ", "
-          + curCity.getStateCode());
-    }
   }
 
   private void printPropMenu() {
     System.out.println(
         "\nThese are the available selections. Press the Enter key to return to main menu.");
-    propMenu.forEach(line -> System.out.println("  " + line));
-    if (Objects.isNull(curState)) {
-      System.out.println("\nYou do not have a state selected");
-    } else if (Objects.isNull(curCity)) {
-      System.out.println(
-          "\nYou are working in State: " + curState + ". \nYou do not have a city selected.");
-    } else if (Objects.isNull(curProperty)) {
-      System.out.println("\nYou are working in " + curCity.getCityName() + ", "
-          + curCity.getStateCode() + ". \nYou do not have a property selected.");
-    } else {
-      System.out.println("\nYou are working with \n" + curProperty.getStreetAddress() + "\n"
-          + curCity.getCityName() + ", " + curCity.getStateCode());
-    }
+    propMenu.forEach(line -> System.out.println("    " + line));
+  }
+
+  private void printUnitMenu() {
+    System.out.println(
+        "\nThese are the available selections. Press the Enter key to return to main menu.");
+    unitMenu.forEach(line -> System.out.println("    " + line));
   }
 
   private int getUserSelection(int menuLevel) {
+    printStatus();
     if (menuLevel == 2) {
       printPropMenu();
+    } else if (menuLevel == 3) {
+      printUnitMenu();
     } else {
       printOperations();
     }
-
     Integer input = getIntInput("\nEnter a menu selection");
 
     return Objects.isNull(input) ? -1 : input;
@@ -360,6 +470,40 @@ public class PropertyManagement {
     }
   }
 
+  private void printStatus() {
+    if (Objects.isNull(curState)) {
+      System.out.println("\nYou do not have a state selected");
+    } else if (Objects.isNull(curCity)) {
+      System.out.println(
+          "\nYou are working in State: " + curState + ". \nYou do not have a city selected.");
+    } else if (Objects.isNull(curProperty)) {
+      System.out.println("\nYou are working in " + curCity.getCityName() + ", "
+          + curCity.getStateCode() + "\nYou do not have a property selected.");
+    } else if (Objects.isNull(curUnit)) {
+      System.out.println("\nYou are working with \n" + curProperty.getStreetAddress() + "\n"
+          + curCity.getCityName() + ", " + curCity.getStateCode()
+          + "\nYou do not have a unit selected.");
+    } else {
+      System.out.println("\nYou are working with \n Unit: " + curUnit.getUnitNumber() + "\n"
+          + curProperty.getStreetAddress() + "\n" + curCity.getCityName() + ", "
+          + curCity.getStateCode());
+      System.out.println("Rental Rate: $" + curUnit.getRent());
 
+      if (curUnit.getLeased()) {
+        System.out.println("Tenant: " + curUnit.getTenant().getName());
+        System.out.println("Phone: " + curUnit.getTenant().getPhone());
+        System.out.println("Email: " + curUnit.getTenant().getEmail());
+      }
+    }
+
+    if (Objects.isNull(curEmployee)) {
+      System.out.println("\nYou do not have an employee selected.");
+    } else {
+      System.out.println("\nCurrent Employee: " + curEmployee.getName());
+      System.out.println("Employee Phone: " + curEmployee.getPhone());
+      System.out.println("Employee Email: " + curEmployee.getEmail());
+      System.out.println("Employee Salary: " + curEmployee.getSalary());
+    }
+  }
 
 }
