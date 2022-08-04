@@ -61,8 +61,8 @@ public class PropertyService {
     
   }
 
-  public void terminateTenant(Integer unitID) {
-    propertyDao.terminateTenant(unitID);
+  public void terminateTenant(Tenant tenant) {
+    propertyDao.terminateTenant(tenant.getId());
     
   }
 

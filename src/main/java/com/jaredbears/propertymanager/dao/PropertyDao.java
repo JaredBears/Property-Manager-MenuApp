@@ -40,7 +40,11 @@ public class PropertyDao extends DaoBase {
 
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-              city = extract(rs, City.class);
+              // city = extract(rs, City.class);
+              city = new City();
+              city.setCityName(rs.getString("city_name"));
+              city.setStateCode(rs.getString("state_code"));
+              city.setCityID(rs.getInt("city_id"));
             }
           }
         }
@@ -77,7 +81,12 @@ public class PropertyDao extends DaoBase {
           List<City> cities = new LinkedList<>();
 
           while (rs.next()) {
-            cities.add(extract(rs, City.class));
+            // cities.add(extract(rs, City.class));
+            City city = new City();
+            city.setCityName(rs.getString("city_name"));
+            city.setStateCode(rs.getString("state_code"));
+            city.setCityID(rs.getInt("city_id"));
+            cities.add(city);
           }
 
           return cities;
@@ -129,7 +138,14 @@ public class PropertyDao extends DaoBase {
           List<Property> properties = new LinkedList<>();
 
           while (rs.next()) {
-            properties.add(extract(rs, Property.class));
+            // properties.add(extract(rs, Property.class));
+            Property property = new Property();
+            property.setStreetAddress(rs.getString("street_address"));
+            property.setMortgage(rs.getBigDecimal("mortgage"));
+            property.setTaxes(rs.getBigDecimal("taxes"));
+            property.setPropertyId(rs.getInt("property_id"));
+            property.setCityId(cityID);
+            properties.add(property);
           }
 
           return properties;
@@ -143,7 +159,7 @@ public class PropertyDao extends DaoBase {
     }
   }
 
-  public Optional<Property> fetchPropertyByID(Integer propertyID) {
+  public Optional<Property> fetchPropertyByID(Integer propertyId) {
     String sql = "SELECT * FROM " + PROPERTY_TABLE + " WHERE property_id = ?";
 
     try (Connection conn = DbConnection.getConnection()) {
@@ -152,18 +168,24 @@ public class PropertyDao extends DaoBase {
         Property property = null;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-          setParameter(stmt, 1, propertyID, Integer.class);
+          setParameter(stmt, 1, propertyId, Integer.class);
 
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-              property = extract(rs, Property.class);
+              // property = extract(rs, Property.class);
+              property = new Property();
+              property.setStreetAddress(rs.getString("street_address"));
+              property.setMortgage(rs.getBigDecimal("mortgage"));
+              property.setTaxes(rs.getBigDecimal("taxes"));
+              property.setPropertyId(propertyId);
+              property.setCityId(rs.getInt("city_id"));
             }
           }
         }
 
 
         if (Objects.nonNull(property)) {
-          property.setUnits(fetchUnitsForProperty(conn, propertyID));
+          property.setUnits(fetchUnitsForProperty(conn, propertyId));
         }
 
         commitTransaction(conn);
@@ -177,16 +199,22 @@ public class PropertyDao extends DaoBase {
     }
   }
 
-  private List<Unit> fetchUnitsForProperty(Connection conn, Integer propertyID) {
+  private List<Unit> fetchUnitsForProperty(Connection conn, Integer propertyId) {
     String sql = "SELECT * FROM " + UNIT_TABLE + " WHERE property_id = ?";
 
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-      setParameter(stmt, 1, propertyID, Integer.class);
+      setParameter(stmt, 1, propertyId, Integer.class);
       try (ResultSet rs = stmt.executeQuery()) {
         List<Unit> units = new LinkedList<>();
 
         while (rs.next()) {
-          Unit unit = extract(rs, Unit.class);
+          // Unit unit = extract(rs, Unit.class);
+          Unit unit = new Unit();
+          unit.setLeased(rs.getBoolean("leased"));
+          unit.setPropertyId(propertyId);
+          unit.setRent(rs.getBigDecimal("rent"));
+          unit.setUnitId(rs.getInt("unit_id"));
+          unit.setUnitNumber(rs.getString("unit_number"));
           if (unit.getLeased()) {
             unit.setTenant(fetchTenantForUnit(conn, unit.getUnitId()));
           }
@@ -209,7 +237,13 @@ public class PropertyDao extends DaoBase {
         Tenant tenant = null;
 
         if (rs.next()) {
-          tenant = extract(rs, Tenant.class);
+          //tenant = extract(rs, Tenant.class);
+          tenant = new Tenant();
+          tenant.setId(rs.getInt("people_id"));
+          tenant.setUnitId(unitID);
+          tenant.setName(rs.getString("name"));
+          tenant.setPhone(rs.getString("phone"));
+          tenant.setEmail(rs.getString("email"));;
         }
 
         return tenant;
@@ -224,7 +258,7 @@ public class PropertyDao extends DaoBase {
     // @formatter:off
     String sql = "" 
       +"INSERT INTO " + PROPERTY_TABLE + " "
-      +"(city_id, street_address, yearly_taxes, monthly_mortgage) "
+      +"(city_id, street_address, taxes, mortgage) "
       +"VALUES "
       +"(?, ?, ?, ?)";
     // @formatter:on
@@ -257,7 +291,7 @@ public class PropertyDao extends DaoBase {
     // @formatter:off
     String sql = "" 
       +"INSERT INTO " + UNIT_TABLE + " "
-      +"(property_id, unit_number, monthly_rent, leased) "
+      +"(property_id, unit_number, rent, leased) "
       +"VALUES "
       +"(?, ?, ?, ?)";
     // @formatter:on
@@ -304,7 +338,13 @@ public class PropertyDao extends DaoBase {
 
           try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-              unit = extract(rs, Unit.class);
+              // unit = extract(rs, Unit.class);
+              unit = new Unit();
+              unit.setLeased(rs.getBoolean("leased"));
+              unit.setPropertyId(rs.getInt("property_id"));
+              unit.setRent(rs.getBigDecimal("rent"));
+              unit.setUnitId(rs.getInt("unit_id"));
+              unit.setUnitNumber(rs.getString("unit_number"));
               if (unit.getLeased()) {
                 setParameter(stmt, 4, 1, Integer.class);
               } else {
