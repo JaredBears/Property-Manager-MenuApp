@@ -18,7 +18,7 @@ public class DbConnection {
         USER, PASSWORD);
     try {
       Connection conn = DriverManager.getConnection(uri);
-      System.out.println("Connection to " + SCHEMA + " is successful\n");
+      //System.out.println("Connection to " + SCHEMA + " is successful\n");
       return conn;
     } catch (SQLException e) {
       e.printStackTrace();

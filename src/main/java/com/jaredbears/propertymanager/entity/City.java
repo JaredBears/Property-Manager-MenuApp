@@ -1,19 +1,17 @@
 package com.jaredbears.propertymanager.entity;
 
-import java.util.List;
-
 public class City {
-  private Integer cityID;
+  private Integer cityId;
   private String stateCode;
   private String cityName;
 
   
   public Integer getCityID() {
-    return cityID;
+    return cityId;
   }
   
   public void setCityID(Integer cityID) {
-    this.cityID = cityID;
+    this.cityId = cityID;
   }
 
   public String getStateCode() {
@@ -31,9 +29,10 @@ public class City {
   public void setCityName(String cityName) {
     this.cityName = cityName;
   }
-
-  public List<Property> getProperties() {
-    // TODO Auto-generated method stub
+  
+  @Override
+  public String toString() {
+    // TODO
     return null;
   }
   

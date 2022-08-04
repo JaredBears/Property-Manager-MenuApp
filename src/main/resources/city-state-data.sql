@@ -1,3 +1,4 @@
+-- Info courtesy of https://www.farinspace.com/us-cities-and-state-sql-dump/ with slight modifications
 -- -----------------
 -- State Info
 -- -----------------

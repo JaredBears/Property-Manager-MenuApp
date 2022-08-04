@@ -1,17 +1,17 @@
 package com.jaredbears.propertymanager.entity;
 
 public abstract class People {
-  private Integer id;
+  private Integer personId;
   private String name;
   private String phone;
   private String email;
   
-  public Integer getID() {
-    return id;
+  public Integer getId() {
+    return personId;
   }
   
-  public void setID(Integer id) {
-    this.id = id;
+  public void setId(Integer id) {
+    this.personId = id;
   }
 
   public String getName() {

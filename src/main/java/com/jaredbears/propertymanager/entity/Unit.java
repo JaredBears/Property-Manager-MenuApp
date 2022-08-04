@@ -3,27 +3,27 @@ package com.jaredbears.propertymanager.entity;
 import java.math.BigDecimal;
 
 public class Unit {
-  private Integer unitID;
-  private Integer propertyID;
+  private Integer unitId;
+  private Integer propertyId;
   private String unitNumber;
   private BigDecimal rent;
   private Boolean leased;
   private Tenant tenant;
   
-  public Integer getUnitID() {
-    return unitID;
+  public Integer getUnitId() {
+    return unitId;
   }
   
-  public void setUnitID(Integer unitID) {
-    this.unitID = unitID;
+  public void setUnitId(Integer unitID) {
+    this.unitId = unitID;
   }
 
-  public Integer getPropertyID() {
-    return propertyID;
+  public Integer getPropertyId() {
+    return propertyId;
   }
 
-  public void setPropertyID(Integer propertyID) {
-    this.propertyID = propertyID;
+  public void setPropertyId(Integer propertyID) {
+    this.propertyId = propertyID;
   }
 
   public String getUnitNumber() {
@@ -58,5 +58,10 @@ public class Unit {
     this.tenant = tenant;
   }
 
+  @Override
+  public String toString() {
+    // TODO
+    return null;
+  }
   
 }

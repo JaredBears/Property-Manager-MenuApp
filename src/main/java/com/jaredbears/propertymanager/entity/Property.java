@@ -4,27 +4,27 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Property {
-  private Integer propertyID;
-  private Integer cityID;
+  private Integer propertyId;
+  private Integer cityId;
   private String streetAddress;
   private BigDecimal taxes;
   private BigDecimal mortgage;
   private List<Unit> units;
   
-  public Integer getPropertyID() {
-    return propertyID;
+  public Integer getPropertyId() {
+    return propertyId;
   }
   
-  public void setPropertyID(Integer propertyID) {
-    this.propertyID = propertyID;
+  public void setPropertyId(Integer propertyId) {
+    this.propertyId = propertyId;
   }
   
-  public Integer getCityID() {
-    return cityID;
+  public Integer getCityId() {
+    return cityId;
   }
   
-  public void setCityID(Integer cityID) {
-    this.cityID = cityID;
+  public void setCityId(Integer cityId) {
+    this.cityId = cityId;
   }
 
   public String getStreetAddress() {
@@ -59,5 +59,10 @@ public class Property {
     this.units = units;
   }
   
+  @Override
+  public String toString() {
+    // TODO
+    return null;
+  }
 
 }

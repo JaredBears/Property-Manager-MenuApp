@@ -43,23 +43,23 @@ CREATE TABLE unit(
 );
 
 CREATE TABLE tenant(
-    tenant_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    person_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
     unit_id INT UNSIGNED NOT NULL,
-    tenant_name VARCHAR(64) NOT NULL,
-    tenant_phone CHAR(10) NOT NULL,
-    tenant_email VARCHAR(64) NOT NULL,
-    PRIMARY KEY (tenant_id),
-    UNIQUE KEY (tenant_name, unit_id),
+    name VARCHAR(64) NOT NULL,
+    phone CHAR(10) NOT NULL,
+    email VARCHAR(64) NOT NULL,
+    PRIMARY KEY (person_id),
+    UNIQUE KEY (name, unit_id),
     FOREIGN KEY (unit_id) REFERENCES unit (unit_id) ON DELETE CASCADE
 );
 
 CREATE TABLE employee(
-    employee_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
-    employee_name VARCHAR(64) NOT NULL,
-    employee_phone CHAR(10) NOT NULL,
-    employee_email VARCHAR(64) NOT NULL,
-    employee_salary DECIMAL(8, 2) NOT NULL,
-    PRIMARY KEY (employee_id)
+    person_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    phone CHAR(10) NOT NULL,
+    email VARCHAR(64) NOT NULL,
+    salary DECIMAL(8, 2) NOT NULL,
+    PRIMARY KEY (person_id)
 );
 
 CREATE TABLE unit_employee(

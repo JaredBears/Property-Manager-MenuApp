@@ -51,13 +51,13 @@ public class PropertyService {
     
   }
 
-  public void updateUnit(Unit curUnit) {
-    propertyDao.updateUnit(curUnit);
+  public Unit updateUnit(Unit curUnit) {
+    return propertyDao.updateUnit(curUnit);
     
   }
 
-  public void addTenant(Tenant tenant) {
-    propertyDao.addTenant(tenant);
+  public Integer addTenant(Tenant tenant) {
+    return propertyDao.addTenant(tenant);
     
   }
 

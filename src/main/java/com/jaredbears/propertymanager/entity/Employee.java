@@ -12,4 +12,10 @@ public class Employee extends People {
   public void setSalary(BigDecimal salary) {
     this.salary = salary;
   }
+  
+  @Override
+  public String toString() {
+    // TODO
+    return null;
+  }
 }

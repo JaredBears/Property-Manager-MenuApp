@@ -34,19 +34,22 @@ public class PropertyManagement {
     "2) Select City",
     "3) Manage properties",
     "4) Manage units",
-    "5) Manage employees"
+    "5) Manage employees",
+    "99) Print All Info"
   );
   private List<String> propMenu = List.of(
     "6) Select a Property",
     "7) Add a Property",
-    "8) Delete a Property"
+    "8) Delete a Property",
+    "99) Print All Info"
   );
   private List<String> unitMenu = List.of(
     "9) Select a Unit",
     "10) Add Unit(s) to Property",
     "11) Delete Unit from Property",
     "12) Lease to Tenant",
-    "13) Terminate Lease"
+    "13) Terminate Lease",
+    "99) Print All Info"
   );
   //@formatter:on
 
@@ -119,6 +122,12 @@ public class PropertyManagement {
             terminate();
             break;
 
+          /*
+           * All Menus
+           */
+          case 99:
+            printAll();
+            break;
           default:
             System.out.println("\n" + selection + " is not a valid selection. Try again.");
             break;
@@ -130,6 +139,14 @@ public class PropertyManagement {
   }
 
 
+  private void printAll() {
+    // TODO Auto-generated method stub
+
+  }
+
+  /************************************
+   * Main Menu
+   ************************************/
   private void selectState() {
     curState = null;
     curCity = null;
@@ -144,8 +161,6 @@ public class PropertyManagement {
     } catch (Exception e) {
       System.out.println("\nInvalid State.  Please try again.");
     }
-
-
   }
 
   private void selectCity() {
@@ -177,9 +192,21 @@ public class PropertyManagement {
 
   private void manageProperties() {
     processUserSelection(2);
+  }
+
+  private void manageUnits() {
+    processUserSelection(3);
+  }
+  
+  private void manageEmployees() {
+    // TODO Auto-generated method stub
 
   }
 
+
+  /************************************
+   * Property Menu
+   ************************************/
   private void selectProperty() {
     curProperty = null;
     curUnit = null;
@@ -205,7 +232,7 @@ public class PropertyManagement {
 
     System.out.println("Property ID)    Street Address");
     for (Property property : properties) {
-      System.out.println(property.getPropertyID() + ")    " + property.getStreetAddress());
+      System.out.println(property.getPropertyId() + ")    " + property.getStreetAddress());
     }
   }
 
@@ -227,7 +254,7 @@ public class PropertyManagement {
 
     Property property = new Property();
 
-    property.setCityID(curCity.getCityID());
+    property.setCityId(curCity.getCityID());
     property.setStreetAddress(streetAddress);
     property.setTaxes(taxes);
     property.setMortgage(mortgage);
@@ -248,15 +275,15 @@ public class PropertyManagement {
     }
 
     System.out.println("\nYou are working with the following property:");
-    System.out.println("Property ID: " + curProperty.getPropertyID());
+    System.out.println("Property ID: " + curProperty.getPropertyId());
     System.out.println(curProperty.getStreetAddress());
     System.out.println(curCity.getCityName() + ", " + curCity.getStateCode());
 
     Integer input = getIntInput(
         "Enter the Property ID to confirm deletion, or press Enter to return to the menu");
 
-    if (input == curProperty.getPropertyID()) {
-      propertyService.deleteProperty(curProperty.getPropertyID());
+    if (input == curProperty.getPropertyId()) {
+      propertyService.deleteProperty(curProperty.getPropertyId());
     } else if (Objects.isNull(input)) {
       System.out.println("\nReturning to menu.");
     } else {
@@ -265,10 +292,9 @@ public class PropertyManagement {
     curProperty = null;
   }
 
-  private void manageUnits() {
-    processUserSelection(3);
-  }
-
+  /************************************
+   * Unit Menu
+   ************************************/
   private void selectUnit() {
     curUnit = null;
     if (Objects.isNull(curProperty)) {
@@ -286,13 +312,12 @@ public class PropertyManagement {
   private void listUnits() {
     System.out.println("Unit ID)  Unit Number");
     for (Unit unit : curProperty.getUnits()) {
-      System.out.println(unit.getUnitID() + ")    " + unit.getUnitNumber());
+      System.out.println(unit.getUnitId() + ")    " + unit.getUnitNumber());
       if (unit.getLeased()) {
         System.out.println("        Tenant: " + unit.getTenant().getName());
       }
     }
   }
-
 
   private void addUnits() {
     curUnit = null;
@@ -304,16 +329,16 @@ public class PropertyManagement {
     }
     for (int i = 0; i < loop; i++) {
       Unit unit = new Unit();
-      Integer propertyID = curProperty.getPropertyID();
+      Integer propertyID = curProperty.getPropertyId();
       String unitNumber = getStringInput("Enter the Unit Number");
       BigDecimal rent = getDecimalInput("Enter the monthly rent");
 
-      unit.setPropertyID(propertyID);
+      unit.setPropertyId(propertyID);
       unit.setUnitNumber(unitNumber);
       unit.setRent(rent);
       unit.setLeased(false);
       unit.setTenant(null);
-      unit.setUnitID(propertyService.addUnit(unit));
+      unit.setUnitId(propertyService.addUnit(unit));
       units.add(unit);
     }
     curProperty.setUnits(units);
@@ -326,15 +351,15 @@ public class PropertyManagement {
     }
 
     System.out.println("\nYou are working with the following unit:");
-    System.out.println("Unit ID: " + curUnit.getUnitID());
+    System.out.println("Unit ID: " + curUnit.getUnitId());
     System.out.println(curUnit.getUnitNumber() + " - " + curProperty.getStreetAddress());
     System.out.println(curCity.getCityName() + ", " + curCity.getStateCode());
 
     Integer input =
         getIntInput("Enter the Unit ID to confirm deletion, or press Enter to return to the menu");
 
-    if (input == curUnit.getUnitID()) {
-      propertyService.deleteUnit(curUnit.getUnitID());
+    if (input == curUnit.getUnitId()) {
+      propertyService.deleteUnit(curUnit.getUnitId());
     } else if (Objects.isNull(input)) {
       System.out.println("\nReturning to menu.");
     } else {
@@ -359,15 +384,17 @@ public class PropertyManagement {
       String phone = getStringInput("Enter the Tenant's phone number");
       String email = getStringInput("Enter the Tenant's email");
 
-      tenant.setUnitID(curUnit.getUnitID());
+      tenant.setUnitId(curUnit.getUnitId());
       tenant.setName(name);
       tenant.setPhone(phone);
       tenant.setEmail(email);
 
       curUnit.setLeased(true);
+      curUnit.setTenant(tenant);
 
       propertyService.updateUnit(curUnit);
       propertyService.addTenant(tenant);
+
     }
   }
 
@@ -378,28 +405,23 @@ public class PropertyManagement {
     }
 
     System.out.println("\nYou are working with the following unit:");
-    System.out.println("Unit ID: " + curUnit.getUnitID());
+    System.out.println("Unit ID: " + curUnit.getUnitId());
     System.out.println(curUnit.getUnitNumber() + " - " + curProperty.getStreetAddress());
     System.out.println(curCity.getCityName() + ", " + curCity.getStateCode());
 
     Integer input = getIntInput(
         "Enter the Unit ID to confirm lease termination, or press Enter to return to the menu");
 
-    if (input == curUnit.getUnitID()) {
+    if (input == curUnit.getUnitId()) {
       curUnit.setLeased(false);
       propertyService.updateUnit(curUnit);
-      propertyService.terminateTenant(curUnit.getUnitID());
+      propertyService.terminateTenant(curUnit.getUnitId());
     } else if (Objects.isNull(input)) {
       System.out.println("\nReturning to menu.");
     } else {
       System.out.println("\nInvalid entry. Returning to menu.");
     }
     curUnit = null;
-  }
-
-  private void manageEmployees() {
-    // TODO Auto-generated method stub
-
   }
 
   private boolean exitMenu() {
