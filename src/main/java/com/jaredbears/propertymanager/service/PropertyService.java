@@ -57,13 +57,38 @@ public class PropertyService {
   }
 
   public Integer addTenant(Tenant tenant) {
-    return propertyDao.addTenant(tenant);
+    return propertyDao.insertTenant(tenant);
     
   }
 
   public void terminateTenant(Tenant tenant) {
-    propertyDao.terminateTenant(tenant.getId());
+    propertyDao.deleteTenant(tenant.getId());
     
+  }
+
+  public Integer addEmployee(Employee employee) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public void deleteEmployee(Integer id) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public Employee fetchEmployeeByID(Integer employeeID) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public List<Employee> fetchEmployees() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Employee updateEmployee(Employee curEmployee) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

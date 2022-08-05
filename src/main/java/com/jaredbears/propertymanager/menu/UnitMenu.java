@@ -16,9 +16,10 @@ class UnitMenu extends Menu {
     this.setOperations(List.of(
       "9) Select a Unit",
       "10) Add Unit(s) to Property",
-      "11) Delete Unit from Property",
-      "12) Lease to Tenant",
-      "13) Terminate Lease",
+      "11) Delete Current Unit from Property",
+      "12) Lease Current Unit to Tenant",
+      "13) Terminate Lease on Current Unit",
+      "14) Raise Rent on Current Unit",
       "99) Print All Info"
     ));
     //@formatter:on
@@ -151,5 +152,10 @@ class UnitMenu extends Menu {
     } else {
       System.out.println("\nInvalid entry. Returning to menu.");
     }
+  }
+
+  void raiseRent() {
+    // TODO Auto-generated method stub
+    
   }
 }

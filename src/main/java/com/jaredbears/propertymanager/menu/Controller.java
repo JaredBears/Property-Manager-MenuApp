@@ -19,7 +19,7 @@ public class Controller {
   Property curProperty;
   Unit curUnit;
   Employee curEmployee;
-  
+
   MainMenu mainMenu = new MainMenu(this);
   PropertyMenu propertyMenu = new PropertyMenu(this);
   UnitMenu unitMenu = new UnitMenu(this);
@@ -88,6 +88,29 @@ public class Controller {
           case 13:
             unitMenu.terminate();
             break;
+          case 14:
+            unitMenu.raiseRent();
+
+            /*
+             * Employee Menu
+             */
+          case 15:
+            employeeMenu.hire();
+            break;
+          case 16:
+            employeeMenu.selectEmployee();
+          case 17:
+            employeeMenu.fire();
+            break;
+          case 18:
+            employeeMenu.raise();
+            break;
+          case 19:
+            employeeMenu.addToUnit();
+            break;
+          case 20:
+            employeeMenu.removeFromUnit();
+            break;
 
           /*
            * All Menus
@@ -95,7 +118,7 @@ public class Controller {
           case 99:
             mainMenu.printAll();
             break;
-            
+
           default:
             System.out.println("\n" + selection + " is not a valid selection. Try again.");
             break;
@@ -105,7 +128,7 @@ public class Controller {
       }
     }
   }
-  
+
   private boolean exitMenu() {
     System.out.println("\nClosing the menu.");
     System.exit(0);
@@ -122,6 +145,10 @@ public class Controller {
       System.out.println(
           "\nThese are the available selections. Press the Enter key to return to main menu.");
       unitMenu.getOperations().forEach(line -> System.out.println("    " + line));
+    } else if (menuLevel == 4) {
+      System.out.println(
+          "\nThese are the available selections. Press the Enter key to return to main menu.");
+      employeeMenu.getOperations().forEach(line -> System.out.println("    " + line));
     } else {
       System.out.println("\nThese are the available selections. Press the Enter key to quit.");
       mainMenu.getOperations().forEach(line -> System.out.println("  " + line));
@@ -131,7 +158,7 @@ public class Controller {
     return Objects.isNull(input) ? -1 : input;
   }
 
-  
+
   String getStringInput(String prompt) {
     System.out.print(prompt + ": ");
     String input = sc.nextLine();

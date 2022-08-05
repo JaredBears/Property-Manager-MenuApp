@@ -286,6 +286,39 @@ public class PropertyDao extends DaoBase {
       throw new DbException(e);
     }
   }
+  
+  public Property updateProperty(Property curProperty){
+    // @formatter:off
+    String sql = "" 
+      +"UPDATE " + PROPERTY_TABLE + " "
+      +"(city_id, street_address, taxes, mortgage) "
+      +"VALUES "
+      +"(?, ?, ?, ?) "
+      +"WHERE property_id = ?";
+    // @formatter:on
+    try (Connection conn = DbConnection.getConnection()) {
+      startTransaction(conn);
+
+      try (PreparedStatement stmt = conn.prepareCall(sql)) {
+        setParameter(stmt, 1, curProperty.getCityId(), Integer.class);
+        setParameter(stmt, 2, curProperty.getStreetAddress(), String.class);
+        setParameter(stmt, 3, curProperty.getTaxes(), BigDecimal.class);
+        setParameter(stmt, 4, curProperty.getMortgage(), BigDecimal.class);
+        setParameter(stmt, 5, curProperty.getPropertyId(), Integer.class);
+
+        stmt.executeUpdate();
+
+        commitTransaction(conn);
+
+        return curProperty;
+      } catch (Exception e) {
+        rollbackTransaction(conn);
+        throw new DbException(e);
+      }
+    } catch (SQLException e) {
+      throw new DbException(e);
+    }
+  }
 
   public Integer insertUnit(Unit unit) {
     // @formatter:off
@@ -366,23 +399,113 @@ public class PropertyDao extends DaoBase {
   }
 
   public boolean deleteUnit(Integer unitID) {
-    // TODO Auto-generated method stub
-    return false;
+    String sql = "DELETE FROM " + UNIT_TABLE + " WHERE unit_id = ?";
+    try (Connection conn = DbConnection.getConnection()) {
+      startTransaction(conn);
+
+      try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        setParameter(stmt, 1, unitID, Integer.class);
+
+        boolean deleted = stmt.executeUpdate() == 1;
+        commitTransaction(conn);
+
+        return deleted;
+
+      } catch (Exception e) {
+        rollbackTransaction(conn);
+        throw new DbException(e);
+      }
+    } catch (SQLException e) {
+      throw new DbException(e);
+    }
   }
 
   public Unit updateUnit(Unit curUnit) {
-    // TODO Auto-generated method stub
-    return null;
+    // @formatter:off
+    String sql = "" 
+      +"UPDATE " + UNIT_TABLE + " "
+      +"(property_id, unit_number, rent, leased) "
+      +"VALUES "
+      +"(?, ?, ?, ?) "
+      +"WHERE unit_id = ?";
+    // @formatter:on
+    try (Connection conn = DbConnection.getConnection()) {
+      startTransaction(conn);
+
+      try (PreparedStatement stmt = conn.prepareCall(sql)) {
+        setParameter(stmt, 1, curUnit.getPropertyId(), Integer.class);
+        setParameter(stmt, 2, curUnit.getUnitNumber(), String.class);
+        setParameter(stmt, 3, curUnit.getRent(), BigDecimal.class);
+        setParameter(stmt, 4, curUnit.getLeased(), Boolean.class);
+        setParameter(stmt, 5, curUnit.getUnitId(), Integer.class);
+
+        stmt.executeUpdate();
+
+        commitTransaction(conn);
+
+        return curUnit;
+      } catch (Exception e) {
+        rollbackTransaction(conn);
+        throw new DbException(e);
+      }
+    } catch (SQLException e) {
+      throw new DbException(e);
+    }
   }
 
-  public Integer addTenant(Tenant tenant) {
-    // TODO Auto-generated method stub
-    return null;
+  public Integer insertTenant(Tenant tenant) {
+    // @formatter:off
+    String sql = "" 
+      +"INSERT INTO " + TENANT_TABLE + " "
+      +"(unit_id, name, phone, email) "
+      +"VALUES "
+      +"(?, ?, ?, ?)";
+    // @formatter:on
+    try (Connection conn = DbConnection.getConnection()) {
+      startTransaction(conn);
+
+      try (PreparedStatement stmt = conn.prepareCall(sql)) {
+        setParameter(stmt, 1, tenant.getUnitId(), Integer.class);
+        setParameter(stmt, 2, tenant.getName(), String.class);
+        setParameter(stmt, 3, tenant.getPhone(), String.class);
+        setParameter(stmt, 4, tenant.getEmail(), String.class);
+
+        stmt.executeUpdate();
+
+        Integer unitId = getLastInsertId(conn, TENANT_TABLE);
+        commitTransaction(conn);
+
+        tenant.setUnitId(unitId);
+        return unitId;
+      } catch (Exception e) {
+        rollbackTransaction(conn);
+        throw new DbException(e);
+      }
+    } catch (SQLException e) {
+      throw new DbException(e);
+    }
   }
 
-  public void terminateTenant(Integer unitID) {
-    // TODO Auto-generated method stub
+  public Boolean deleteTenant(Integer unitID) {
+    String sql = "DELETE FROM " + TENANT_TABLE + " WHERE unit_id = ?";
+    try (Connection conn = DbConnection.getConnection()) {
+      startTransaction(conn);
 
+      try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        setParameter(stmt, 1, unitID, Integer.class);
+
+        boolean deleted = stmt.executeUpdate() == 1;
+        commitTransaction(conn);
+
+        return deleted;
+
+      } catch (Exception e) {
+        rollbackTransaction(conn);
+        throw new DbException(e);
+      }
+    } catch (SQLException e) {
+      throw new DbException(e);
+    }
   }
 
 }

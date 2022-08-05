@@ -74,7 +74,7 @@ class MainMenu extends Menu {
   }
   
   void manageEmployees() {
-    // TODO Auto-generated method stub
+    controller.processUserSelection(4);
 
   }
 
